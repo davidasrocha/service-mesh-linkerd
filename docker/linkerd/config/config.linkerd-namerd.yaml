@@ -1,0 +1,35 @@
+admin:
+  port: 9990
+  ip: 0.0.0.0
+
+routers:
+- protocol: http
+  httpAccessLog: /var/log/linkerd/assets-api/access.log
+  label: AssetAPI
+  interpreter:
+    kind: io.l5d.namerd
+    namespace: assets
+    dst: /$/inet/service_discovery/4321
+  servers:
+  - port: 9001
+    ip: 0.0.0.0
+- protocol: http
+  httpAccessLog: /var/log/linkerd/uploads-api/access.log
+  label: UploadAPI
+  interpreter:
+    kind: io.l5d.namerd
+    namespace: uploads
+    dst: /$/inet/service_discovery/4321
+  servers:
+  - port: 9002
+    ip: 0.0.0.0
+- protocol: http
+  httpAccessLog: /var/log/linkerd/metadata-api/access.log
+  label: MetadataAPI
+  interpreter:
+    kind: io.l5d.namerd
+    namespace: metadatas
+    dst: /$/inet/service_discovery/4321
+  servers:
+  - port: 9003
+    ip: 0.0.0.0

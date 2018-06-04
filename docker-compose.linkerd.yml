@@ -1,0 +1,65 @@
+version: '2'
+
+services:
+
+    # infrastructure
+    dns:
+      image: nginx:latest
+      extends:
+        file: ./docker/env.yml
+        service: dns
+      volumes:
+        - .:/var/www/html
+        - ./docker/nginx/conf.d/dns.conf:/etc/nginx/conf.d/default.conf
+      links:
+        - mesh
+
+    # platform
+    mesh:
+      image: buoyantio/linkerd:1.4.1
+      extends:
+        file: ./docker/env.yml
+        service: mesh
+      volumes:
+        - ./docker/linkerd/config/config.linkerd.yaml:/config.yaml
+      command: /config.yaml
+      links:
+        - web_asset
+        - web_upload
+        - web_metadata
+
+    # application
+    web_asset:
+      image: nginx:latest
+      ports:
+        - "81"
+      volumes:
+        - .:/var/www/html
+        - ./docker/nginx/conf.d/web.conf:/etc/nginx/conf.d/default.conf
+      links:
+        - php
+
+    web_upload:
+      image: nginx:latest
+      ports:
+        - "82"
+      volumes:
+        - .:/var/www/html
+        - ./docker/nginx/conf.d/web.conf:/etc/nginx/conf.d/default.conf
+      links:
+        - php
+
+    web_metadata:
+      image: nginx:latest
+      ports:
+        - "83"
+      volumes:
+        - .:/var/www/html
+        - ./docker/nginx/conf.d/web.conf:/etc/nginx/conf.d/default.conf
+      links:
+        - php
+
+    php:
+      image: php:7.2-fpm
+      volumes:
+        - .:/var/www/html
